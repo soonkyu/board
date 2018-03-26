@@ -98,20 +98,15 @@
     	from
     		comment
     	where
-    		commentPwd = #{commentPwd}
+    		commentNum= #{commentNum}
+    	AND	commentPwd = #{commentPwd}
     <choose>
 
     	<when test='reply_type != null and reply_type.equals("main") '>
 
-      AND commentParent = #{commentNum}
+      or commentParent = #{commentNum}
 
     </when>
-
-    <otherwise>
-
-      AND commentNum=#{commentNum}
-
-    </otherwise>
 
 	</choose>
  	   	   		
