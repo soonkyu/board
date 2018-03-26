@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.spring.myapp.dao.BoardDao">
+    <insert id="insertContent" parameterType="java.util.HashMap">
+        insert into board(
+        	idx,
+			name,
+			pwd,
+			title,
+			contents,
+			currentdate,
+			noticeChk
+		)values(
+			#{idx},
+			#{name},
+			#{pwd},
+			#{title},
+			#{contents},
+			Replace(Convert(varchar(30),Getdate(),120),'-','/'),
+			'nomal'
+		)
+    </insert>
+
+    <select id="selectContent" resultType="com.spring.myapp.domain.Board" parameterType="java.util.HashMap">
+		SELECT *
+		FROM
+			(
+				SELECT ROW_NUMBER() over (ORDER BY idx DESC) rnum, *
+				FROM board
+				
+				) A
+		WHERE rnum BETWEEN #{start} AND #{end}
+
+		
+    </select>
+    <select id="selectContentView" resultType="com.spring.myapp.domain.Board" parameterType="int">
+    	select *
+    	from board
+    	where idx = #{idx}
+    </select>
+    <insert id="insertBoardReply" parameterType="java.util.HashMap" useGeneratedKeys="true">
+        insert into comment(
+        	commentNum,
+        	commentBrdNum,
+			commentParent,
+			commentDepth,
+			commentContents,
+			commentId,
+			commentPwd,
+			commentOrder,
+			commentDate
+		)values(
+			#{commentNum},
+			#{commentBrdNum},
+			#{commentParent},
+			#{commentDepth},
+			#{commentContents},
+			#{commentId},
+			#{commentPwd},
+			#{commentOrder},
+			Replace(Convert(varchar(30),Getdate(),120),'-','/')
+		)
+    </insert>
+    
+    <select id="MaxCommentIdx" resultType="int">
+    
+    	select isnull(max(commentNum),0) from comment
+    
+    </select>
+    
+    <select id="selectComment" parameterType="int" resultType="com.spring.myapp.domain.BoardReply" >
+    	select * from comment where commentBrdNum=#{commentBrdNum} order by commentParent desc,commentOrder asc
+    
+    </select>
+    
+    
+    <update id="updateBoard" parameterType="com.spring.myapp.domain.Board">
+    	 update board
+    	 set 
+    	    name=#{name},
+			pwd=#{pwd},
+			title=#{title},
+			contents=#{contents},
+			currentdate=Replace(Convert(varchar(30),Getdate(),120),'-','/')
+		 where 
+		    idx=#{idx}
+    </update>
+    
+    <select id="selectBoardReplyList" resultType="com.spring.myapp.domain.BoardReply" parameterType="java.util.HashMap">
+    	select *
+		from comment
+		where commentBrdNum = #{commentBrdNum}
+    </select>
+    
+    <delete id="deleteBoardReply" parameterType="java.util.HashMap">
+    	delete
+    	from
+    		comment
+    	where
+    		commentPwd = #{commentPwd}
+    <choose>
+
+    	<when test='reply_type != null and reply_type.equals("main") '>
+
+      AND commentParent = #{commentNum}
+
+    </when>
+
+    <otherwise>
+
+      AND commentNum=#{commentNum}
+
+    </otherwise>
+
+	</choose>
+ 	   	   		
+    </delete>
+    <select id="selectBoardCnt" resultType="int">
+    	select
+    		count(*)
+    	from
+    		board
+    </select>
+    
+    <select id="boardCheck" parameterType="hashMap" resultType="int">
+    	
+    	select count(idx) 
+    	from board 
+    	where idx=#{idx} and pwd=#{pwd}  
+    
+    
+    </select>
+    
+    
+    
+    <select id="maxIdx" resultType="int">
+    	select max(idx)
+    	from board 
+    
+    </select>
+
+    <delete id="deleteBoard" parameterType="java.util.HashMap">
+        delete
+        from board
+        where 
+        idx= #{idx} and pwd = #{pwd}
+    </delete>
+</mapper>

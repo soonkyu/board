@@ -1,0 +1,16 @@
+@import url(//fonts.googleapis.com/earlyaccess/hanna.css);
+body,h1,h2,h3,h4,h5,h6 {font-family: 'Hanna', sans-serif;font-size: 20px;}
+.mouseOverHighlight {
+				   border-bottom: 1px solid blue;
+				   cursor: pointer !important;
+				   color: blue;
+				   pointer-events: auto;
+}
+
+textarea{
+	  width:100%;
+	}
+	
+.reply_reply {
+		border: 2px solid #FF50CF;
+	}
